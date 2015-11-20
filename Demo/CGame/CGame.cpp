@@ -15,12 +15,6 @@ void CGame::GameInit()
 	//map
 	_map.init("./content/map/map1-1.txt", "./content/map/tileset1.png");
 
-#pragma region inputDevice
-	this->inputDevice.Initialize(
-		CGraphics::GetInstancePtr()->GetHInst(),
-		CGraphics::GetInstancePtr()->GetWND());
-#pragma endregion
-
 #pragma region pDefaultFont
 	SAFE_RELEASE(this->pDefaultFont);
 	HR(D3DXCreateFont(
@@ -35,8 +29,8 @@ void CGame::GameInit()
 		&this->pDefaultFont));
 #pragma endregion
 
-#pragma region mario
-	this->mario.Initialize(CGraphics::GetInstancePtr()->GetDevice());
+#pragma region luigi
+	this->luigi.Initialize(CGraphics::GetInstancePtr()->GetDevice());
 #pragma endregion
 }
 
@@ -95,7 +89,6 @@ void CGame::ToggleFullScreen()
 			SCREEN_WIDTH, SCREEN_HEIGHT,
 			SWP_NOZORDER | SWP_SHOWWINDOW);
 
-	
 		this->OnLostDevice();
 
 		HR(CGraphics::GetInstancePtr()->GetDevice()->Reset(
@@ -109,10 +102,12 @@ void CGame::OnLostDevice()
 {
 	HR(CGraphics::GetInstancePtr()->GetSprite()->OnLostDevice());
 	HR(this->pDefaultFont->OnLostDevice());
+	this->luigi.OnLostDevice();
 }
 
 void CGame::OnResetDevice()
 {
 	HR(CGraphics::GetInstancePtr()->GetSprite()->OnResetDevice());
 	HR(this->pDefaultFont->OnResetDevice());
+	this->luigi.OnResetDevice();
 }

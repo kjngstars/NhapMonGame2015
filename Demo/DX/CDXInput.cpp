@@ -49,7 +49,9 @@ void CDXInput::Update()
 	}
 
 	for (int i = 0;i < 256;i++)
-		this->previousKeyboardState[i] = this->currentKeyboardState[i];
+		if (this->KeyDown(this->currentKeyboardState[i]))
+			this->previousKeyboardState[i] = this->currentKeyboardState[i];
+
 	hr = this->pKeyboard->GetDeviceState(
 		sizeof(this->currentKeyboardState), (void**)&this->currentKeyboardState);
 	if (FAILED(hr))
@@ -57,6 +59,12 @@ void CDXInput::Update()
 		ZeroMemory(this->currentKeyboardState, sizeof(this->currentKeyboardState));
 		hr = this->pKeyboard->Acquire();
 	}
+}
+
+void CDXInput::Change()
+{
+	for (int i = 0;i < 256;i++)
+		this->previousKeyboardState[i] = this->currentKeyboardState[i];
 }
 
 bool CDXInput::KeyDown(int key)

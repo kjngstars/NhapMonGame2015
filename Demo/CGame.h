@@ -4,18 +4,16 @@
 #include "GameConfig.h"
 #include "CObject.h"
 #include "DX\CDXInput.h"
-#include "CMario\CMario.h"
+#include "CLuigi\CLuigi.h"
 #include "CMap.h"
 
 class CGame
 {
 private:
-	CDXInput inputDevice;
 	ID3DXFont* pDefaultFont = 0;
 
 	CMap _map;
-
-	CMario mario;
+	CLuigi luigi;
 	
 public:
 	bool isPaused = false;
@@ -31,6 +29,6 @@ public:
 	void OnLostDevice();
 	void OnResetDevice();
 
-	void Update(float dt);
+	void Update(float dt, CDXInput* inputDevice);
 	void Render();
 };

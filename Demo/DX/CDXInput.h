@@ -22,6 +22,7 @@ public:
 	void Initialize(HINSTANCE hInstance, HWND wnd);
 
 	void Update();
+	void Change();
 
 	bool KeyDown(int key);
 	bool KeyPress(int key);

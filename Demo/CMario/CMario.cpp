@@ -1,5 +1,10 @@
 #include "CMario.h"
 
+CMario::~CMario()
+{
+	SAFE_RELEASE(this->pEffect);
+}
+
 void CMario::Initialize(IDirect3DDevice9* pD3DDevice)
 {
 	D3DXIMAGE_INFO info;
@@ -10,6 +15,15 @@ void CMario::Initialize(IDirect3DDevice9* pD3DDevice)
 		D3DFMT_UNKNOWN, D3DPOOL_MANAGED,
 		D3DX_DEFAULT, D3DX_DEFAULT,
 		0, &info, 0, &this->_texture);
+
+	ID3DXBuffer* errors = 0;
+	HR(D3DXCreateEffectFromFile(pD3DDevice, "./Content/Mario/e0.fx",
+		0, 0, D3DXSHADER_DEBUG, 0, &this->pEffect, &errors));
+	if (errors)
+		MessageBox(0, (char*)errors->GetBufferPointer(), 0, 0);
+
+	HR(this->pEffect->SetTechnique("DefaultTech"));
+	HR(this->pEffect->SetTexture("texture0", this->_texture));
 
 	this->_rotate = 0.0f;
 	this->_scale = { 1.0f, 1.0f };
@@ -59,4 +73,14 @@ void CMario::CheckShotting(CDXInput* inputDevice)
 	}
 	else
 		this->isShotting = false;
+}
+
+void CMario::OnLostDevice()
+{
+	HR(this->pEffect->OnLostDevice());
+}
+
+void CMario::OnResetDevice()
+{
+	HR(this->pEffect->OnResetDevice());
 }

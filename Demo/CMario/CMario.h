@@ -52,6 +52,8 @@ private:
 	RECT sourceRect = RECT{ 0, 0, 0, 0 };
 	D3DXCOLOR color = { 255,255,255,255 };
 
+	ID3DXEffect* pEffect = 0;
+
 	void UpdateState(CDXInput* inputDevice);
 	void UpdateVelocity(float elapsedTime, CDXInput* inputDevice);
 	void UpdateDelayTime();
@@ -67,6 +69,7 @@ private:
 
 public:
 	CMario() {}
+	~CMario();
 
 	void Initialize(IDirect3DDevice9* pD3DDevice);
 	void Update(float elapsedTime, CDXInput* inputDevice);
@@ -82,6 +85,9 @@ public:
 
 	void Shrink(float elapsedTime);
 	void ShrinkDown();
+
+	void OnLostDevice();
+	void OnResetDevice();
 
 	int GetFrame() { return this->frame; }
 	float GetDelayTime() { return this->delayTime; };

@@ -4,6 +4,7 @@
 
 bool gameover = false;
 CGame game;
+CDXInput inputDevice;
 
 LRESULT WINAPI WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -47,7 +48,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CreateMutex(0, 0, APP_TITLE);
 	else
 		return 0;
-		
+
 	//initialize window settings
 	WNDCLASSEX wc;
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -62,20 +63,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	wc.lpszMenuName = NULL;
 	wc.lpszClassName = APP_TITLE;
 	wc.hIconSm = NULL;
-	
+
 	if (!RegisterClassEx(&wc))
 	{
 		MessageBox(0, "RegisterClass FAILED", 0, 0);
 		PostQuitMessage(0);
 	}
-	
+
 	//create a new window
 	HWND window = CreateWindow(
 		APP_TITLE, APP_TITLE,
 		WS_OVERLAPPED | WS_SYSMENU | WS_MINIMIZEBOX,
 		CW_USEDEFAULT, CW_USEDEFAULT,
 		SCREEN_WIDTH, SCREEN_HEIGHT, NULL, NULL, hInstance, NULL);
-	
+
 	if (window == 0)
 	{
 		MessageBox(0, "CreateWindow FAILED", 0, 0);
@@ -89,6 +90,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	UpdateWindow(window);
 
 	game.GameInit();
+	inputDevice.Initialize(
+		CGraphics::GetInstancePtr()->GetHInst(),
+		CGraphics::GetInstancePtr()->GetWND());
 
 	// main message loop
 	MSG message;
@@ -104,7 +108,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	QueryPerformanceCounter(&start);
 
 	float dt = 0.0f;
-	float totalElapsedTime = 0.0f;
 
 	while (!gameover)
 	{
@@ -113,26 +116,27 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		}
-		
+
 		if (!game.IsLostDevice())
 		{
 			QueryPerformanceCounter(&stop);
 			elapsedTime.QuadPart = stop.QuadPart - start.QuadPart;
 
-			dt = (float)elapsedTime.QuadPart * 1000.0f /
+			dt += (float)elapsedTime.QuadPart * 1000.0f /
 				(float)frequency.QuadPart;
-			totalElapsedTime += dt;
+			inputDevice.Update();
 
-			game.Update(dt);
-
-			if (totalElapsedTime >= time_per_frame)
+			if (dt >= time_per_frame)
 			{
+				game.Update(dt, &inputDevice);
 				game.Render();
-				totalElapsedTime = 0.0f;
+
+				dt = 0.0f;
+				inputDevice.Change();
 			}
 
 			start = stop;
-		}	
+		}
 	}
 
 	//shutdown
